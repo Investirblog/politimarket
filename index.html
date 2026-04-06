@@ -10,16 +10,16 @@
 
   <style>
     :root {
-      --bg:       #0a0a0f;
-      --bg2:      #111118;
-      --bg3:      #17171f;
-      --border:   #2a2a38;
-      --text:     #e8e8f0;
-      --muted:    #6b6b88;
-      --accent:   #ff4d2e;
-      --green:    #2ecc8a;
-      --yellow:   #f5c842;
-      --blue:     #4d8cff;
+      --bg:       #f7f5f0;
+      --bg2:      #ffffff;
+      --bg3:      #eeece7;
+      --border:   #dedad2;
+      --text:     #1a1814;
+      --muted:    #8a8478;
+      --accent:   #c0392b;
+      --green:    #1a7a52;
+      --yellow:   #b07d10;
+      --blue:     #1a5cbf;
       --mono:     'Space Mono', monospace;
       --serif:    'Fraunces', Georgia, serif;
     }
@@ -38,17 +38,6 @@
       overflow-x: hidden;
     }
 
-    /* Grain overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.4;
-    }
-
     /* ---- HEADER ---- */
     header {
       border-bottom: 1px solid var(--border);
@@ -59,7 +48,7 @@
       height: 56px;
       position: sticky;
       top: 0;
-      background: rgba(10, 10, 15, 0.95);
+      background: rgba(247, 245, 240, 0.96);
       backdrop-filter: blur(12px);
       z-index: 100;
     }
@@ -237,8 +226,9 @@
     }
 
     .market-card:hover {
-      border-color: #3a3a50;
+      border-color: #b0a898;
       transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
     }
 
     .card-top {
@@ -350,9 +340,9 @@
       letter-spacing: 0.05em;
     }
 
-    .trend-up   { background: rgba(46,204,138,0.15); color: var(--green); }
-    .trend-down { background: rgba(255,77,46,0.15);  color: var(--accent); }
-    .trend-flat { background: rgba(107,107,136,0.15); color: var(--muted); }
+    .trend-up   { background: rgba(26,122,82,0.12);  color: var(--green); }
+    .trend-down { background: rgba(192,57,43,0.12);  color: var(--accent); }
+    .trend-flat { background: rgba(138,132,120,0.12); color: var(--muted); }
 
     /* ---- PANEL VIDE / LOADING ---- */
     .loading-state {
@@ -421,7 +411,7 @@
 
     .top-table td {
       padding: 12px 12px;
-      border-bottom: 1px solid rgba(42,42,56,0.5);
+      border-bottom: 1px solid rgba(180,175,165,0.4);
       vertical-align: middle;
     }
 
