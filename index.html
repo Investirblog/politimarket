@@ -168,8 +168,9 @@
     .prob-fill { height: 100%; border-radius: 4px; transition: width .9s cubic-bezier(.4,0,.2,1); }
 
     /* SPARKLINE */
-    .chart-wrap { margin: 14px 0 10px; position: relative; }
+    .chart-wrap { margin: 14px 0 10px; position: relative; height: 60px; }
     .chart-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    .chart-wrap canvas { position: absolute; top: 18px; left: 0; width: 100% !important; height: 42px !important; }
 
     /* MOVE BADGE */
     .move-badge {
@@ -486,7 +487,8 @@ function drawChart(id, data, hex) {
         fill: true, backgroundColor: hex+'18', tension: 0.4, pointRadius: 0, pointHoverRadius: 3 }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: false,
+      maintainAspectRatio: false,
       plugins: { legend:{display:false}, tooltip:{ callbacks:{label:c=>c.parsed.y+'%'} } },
       scales: {
         x: { display: false },
@@ -543,7 +545,7 @@ function renderCard(def, market, history) {
         <div class="prob-fill ${st.fill}" style="width:0%" data-target="${pct}"></div>
       </div>
     </div>
-    ${hist?`<div class="chart-wrap"><div class="chart-label">Évolution 7 jours</div><canvas id="${cid}" style="height:52px"></canvas></div>`:''}
+    ${hist?`<div class="chart-wrap"><div class="chart-label">Évolution 7 jours</div><canvas id="${cid}" width="300" height="42"></canvas></div>`:''}
     <div class="card-footer">
       <span class="card-vol">Vol. <strong>${formatVol(market.volume)}</strong></span>
       <span class="card-end">⏳ ${formatDate(market.endDate)}</span>
