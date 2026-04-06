@@ -4,867 +4,689 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PolitiMarket — Ce que les marchés pensent de la politique</title>
-  <meta name="description" content="Dashboard en temps réel des marchés de prédiction politiques (Polymarket). Midterms US, élections européennes, macro.">
+  <meta name="description" content="Dashboard en temps réel des marchés de prédiction politiques (Polymarket). Midterms US, élections européennes, macro, bourse.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg:       #f7f5f0;
-      --bg2:      #ffffff;
-      --bg3:      #eeece7;
-      --border:   #dedad2;
-      --text:     #1a1814;
-      --muted:    #8a8478;
-      --accent:   #c0392b;
-      --green:    #1a7a52;
-      --yellow:   #b07d10;
-      --blue:     #1a5cbf;
-      --mono:     'Space Mono', monospace;
-      --serif:    'Fraunces', Georgia, serif;
+      --bg:      #ffffff;
+      --bg2:     #f8f9fa;
+      --bg3:     #e9ecef;
+      --border:  #dee2e6;
+      --text:    #212529;
+      --muted:   #6c757d;
+      --accent:  #c0392b;
+      --green:   #1e7e4a;
+      --yellow:  #9a6b00;
+      --blue:    #1a56a8;
+      --sans:    'Open Sans', sans-serif;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
-
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
+      font-family: var(--sans);
+      font-size: 15px;
       line-height: 1.6;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* ---- HEADER ---- */
+    /* HEADER */
     header {
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
+      border-bottom: 2px solid var(--border);
+      padding: 0 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 56px;
+      height: 60px;
       position: sticky;
       top: 0;
-      background: rgba(247, 245, 240, 0.96);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(8px);
       z-index: 100;
     }
-
-    .logo {
-      font-family: var(--serif);
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text);
-      text-decoration: none;
+    .logo { font-size: 22px; font-weight: 700; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 18px; }
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--green); font-weight: 600;
     }
-
-    .logo span {
-      color: var(--accent);
+    .live-badge::before {
+      content: ''; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green); animation: pulse 2s infinite;
     }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .last-update { font-size: 13px; color: var(--muted); }
 
-    .header-meta {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .live-dot {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.05em;
-    }
-
-    .live-dot::before {
-      content: '';
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .last-update {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* ---- HERO ---- */
+    /* HERO */
     .hero {
-      padding: 48px 24px 32px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .hero-label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 12px;
-    }
-
-    .hero h1 {
-      font-family: var(--serif);
-      font-size: clamp(28px, 4vw, 46px);
-      font-weight: 700;
-      line-height: 1.1;
-      color: var(--text);
-      max-width: 600px;
-      margin-bottom: 16px;
-    }
-
-    .hero h1 em {
-      font-style: italic;
-      color: var(--muted);
-    }
-
-    .hero-sub {
-      color: var(--muted);
-      max-width: 480px;
-      line-height: 1.8;
-      font-size: 12px;
-    }
-
-    .hero-sub a {
-      color: var(--blue);
-      text-decoration: none;
-    }
-
-    /* ---- TABS ---- */
-    .tabs {
-      max-width: 1100px;
-      margin: 32px auto 0;
-      padding: 0 24px;
-      display: flex;
-      gap: 0;
+      background: var(--bg2);
       border-bottom: 1px solid var(--border);
+      padding: 36px 28px 28px;
     }
+    .hero-inner { max-width: 1100px; margin: 0 auto; }
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(192,57,43,.08);
+      border: 1px solid rgba(192,57,43,.2);
+      border-radius: 4px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: clamp(22px, 3.5vw, 36px);
+      font-weight: 700; color: var(--text);
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .hero-sub { font-size: 15px; color: var(--muted); max-width: 560px; line-height: 1.7; }
+    .hero-sub a { color: var(--blue); }
 
+    /* TABS */
+    .tabs-wrap {
+      border-bottom: 2px solid var(--border);
+      background: var(--bg);
+      position: sticky; top: 60px; z-index: 90;
+    }
+    .tabs { max-width: 1100px; margin: 0 auto; padding: 0 28px; display: flex; }
     .tab {
-      padding: 10px 20px;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color 0.2s, border-color 0.2s;
-      background: none;
-      border-top: none;
-      border-left: none;
-      border-right: none;
+      padding: 14px 20px;
+      font-family: var(--sans); font-size: 14px; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      border: none; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; background: none;
+      transition: color .2s, border-color .2s; white-space: nowrap;
     }
-
     .tab:hover { color: var(--text); }
-    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* ---- MAIN GRID ---- */
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 24px 80px;
-    }
+    /* MAIN */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 28px 80px; }
 
     .section-title {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      margin-bottom: 16px; margin-top: 36px;
+      display: flex; align-items: center; gap: 10px;
     }
+    .section-title:first-child { margin-top: 0; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ---- MARKET CARD ---- */
+    /* CARDS GRID */
     .markets-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 12px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px; margin-bottom: 8px;
     }
-
     .market-card {
-      background: var(--bg2);
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 18px 20px;
-      transition: border-color 0.2s, transform 0.2s;
+      border-top: 3px solid var(--card-accent, var(--border));
+      border-radius: 8px;
+      padding: 20px 22px 16px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+      display: flex; flex-direction: column;
     }
-
-    .market-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--bar-color, var(--border));
-      transition: background 0.3s;
-    }
-
     .market-card:hover {
-      border-color: #b0a898;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+      box-shadow: 0 6px 20px rgba(0,0,0,.1);
+      transform: translateY(-2px);
     }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 14px;
-      gap: 12px;
+    .card-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 10px;
     }
-
     .card-category {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
     }
-
-    .card-emoji {
-      font-size: 16px;
-      line-height: 1;
-    }
-
+    .card-emoji { font-size: 18px; }
     .card-question {
-      font-family: var(--serif);
-      font-size: 14px;
-      font-weight: 300;
-      color: var(--text);
-      line-height: 1.4;
-      margin-bottom: 18px;
-      min-height: 40px;
+      font-size: 15px; font-weight: 600;
+      color: var(--text); line-height: 1.4;
+      margin-bottom: 16px; flex: 1;
     }
 
-    /* Barre de probabilité */
-    .prob-bar-wrap {
-      margin-bottom: 12px;
+    /* PROB */
+    .prob-section { margin-bottom: 14px; }
+    .prob-row {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 8px;
     }
+    .prob-yes-val { font-size: 30px; font-weight: 700; line-height: 1; }
+    .prob-yes-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+    .prob-no-block { text-align: right; }
+    .prob-no-val { font-size: 17px; font-weight: 700; color: var(--muted); }
+    .prob-no-label { font-size: 12px; color: var(--muted); }
+    .prob-track { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+    .prob-fill { height: 100%; border-radius: 4px; transition: width .9s cubic-bezier(.4,0,.2,1); }
 
-    .prob-bar-track {
-      height: 6px;
-      background: var(--bg3);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 8px;
+    /* SPARKLINE */
+    .chart-wrap { margin: 14px 0 10px; position: relative; }
+    .chart-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+
+    /* MOVE BADGE */
+    .move-badge {
+      font-size: 12px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px;
+      margin-left: 8px; vertical-align: middle;
     }
+    .move-up   { background: rgba(30,126,74,.12);  color: var(--green);  }
+    .move-down { background: rgba(192,57,43,.12);  color: var(--accent); }
+    .move-flat { background: rgba(108,117,125,.12); color: var(--muted);  }
 
-    .prob-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .prob-labels {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .prob-yes {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      line-height: 1;
-    }
-
-    .prob-no {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .prob-no span {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    /* Couleurs selon probabilité */
-    .prob-high   { color: var(--accent);  --bar-fill: var(--accent); }
-    .prob-med    { color: var(--yellow);  --bar-fill: var(--yellow); }
-    .prob-low    { color: var(--green);   --bar-fill: var(--green);  }
+    /* COLORS */
+    .c-red    { color: var(--accent); }
+    .c-yellow { color: var(--yellow); }
+    .c-green  { color: var(--green);  }
+    .fill-red    { background: var(--accent); }
+    .fill-yellow { background: var(--yellow); }
+    .fill-green  { background: var(--green);  }
 
     .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 12px; border-top: 1px solid var(--border); margin-top: 6px;
     }
+    .card-vol { font-size: 13px; color: var(--muted); }
+    .card-vol strong { color: var(--text); font-weight: 700; }
+    .card-end { font-size: 13px; color: var(--muted); }
 
-    .card-volume {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .card-volume strong {
-      color: var(--text);
-    }
-
-    .card-end {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* Badge tendance */
-    .trend-badge {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-
-    .trend-up   { background: rgba(26,122,82,0.12);  color: var(--green); }
-    .trend-down { background: rgba(192,57,43,0.12);  color: var(--accent); }
-    .trend-flat { background: rgba(138,132,120,0.12); color: var(--muted); }
-
-    /* ---- PANEL VIDE / LOADING ---- */
-    .loading-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--muted);
-    }
-
+    /* LOADING */
+    .loading-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 15px; }
     .spinner {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 16px;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
+    @keyframes spin { to { transform: rotate(360deg); } }
     .error-state {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 32px;
-      text-align: center;
-      color: var(--muted);
+      border: 1px solid var(--border); border-radius: 8px; padding: 32px;
+      text-align: center; color: var(--muted); background: var(--bg2); font-size: 15px;
     }
-
     .error-state strong { color: var(--accent); display: block; margin-bottom: 8px; }
 
-    /* ---- BANNER INFO ---- */
+    /* BANNER */
     .info-banner {
-      background: rgba(77,140,255,0.08);
-      border: 1px solid rgba(77,140,255,0.2);
-      border-radius: 6px;
-      padding: 14px 18px;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      background: rgba(26,86,168,.06);
+      border: 1px solid rgba(26,86,168,.18);
+      border-radius: 8px; padding: 14px 18px;
+      font-size: 14px; color: var(--text);
+      margin-bottom: 28px; display: flex; gap: 12px; line-height: 1.6;
     }
-
     .info-banner strong { color: var(--blue); }
 
-    /* ---- TOP MARCHÉS ---- */
-    .top-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
+    /* TOP TABLE */
+    .top-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .top-table th {
-      text-align: left;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
+      text-align: left; font-size: 12px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
     }
-
-    .top-table td {
-      padding: 12px 12px;
-      border-bottom: 1px solid rgba(180,175,165,0.4);
-      vertical-align: middle;
-    }
-
+    .top-table td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
     .top-table tr:hover td { background: var(--bg2); }
+    .top-question { font-weight: 600; color: var(--text); max-width: 380px; }
+    .top-prob { font-weight: 700; font-size: 15px; }
+    .top-vol { color: var(--muted); white-space: nowrap; }
 
-    .top-question {
-      font-family: var(--serif);
-      font-size: 13px;
-      color: var(--text);
-      max-width: 400px;
+    /* SEMAINE */
+    .semaine-header {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px 24px; margin-bottom: 24px;
     }
-
-    .top-prob {
-      font-weight: 700;
-      font-size: 14px;
-      white-space: nowrap;
+    .semaine-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .semaine-header p { color: var(--muted); font-size: 14px; }
+    .semaine-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 18px 22px; margin-bottom: 12px;
     }
-
-    .top-vol {
-      color: var(--muted);
-      font-size: 11px;
-      white-space: nowrap;
+    .semaine-card-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 16px; margin-bottom: 10px;
     }
-
-    /* ---- FOOTER ---- */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.8;
+    .semaine-question { font-size: 15px; font-weight: 600; flex: 1; }
+    .semaine-move { font-size: 22px; font-weight: 700; white-space: nowrap; }
+    .semaine-meta { font-size: 13px; color: var(--muted); display: flex; gap: 20px; flex-wrap: wrap; }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; border: none; border-radius: 6px;
+      padding: 10px 20px; font-family: var(--sans); font-size: 14px; font-weight: 600;
+      cursor: pointer; margin-top: 20px; transition: opacity .2s;
     }
+    .copy-btn:hover { opacity: .85; }
+    .copy-btn.copied { background: var(--green); }
 
-    footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
-
-    /* ---- PANEL TABS ---- */
+    /* TAB PANELS */
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ---- RESPONSIVE ---- */
-    @media (max-width: 600px) {
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 24px 28px;
+      text-align: center; color: var(--muted); font-size: 13px; line-height: 1.8;
+    }
+    footer a { color: var(--muted); text-underline-offset: 3px; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .market-card { animation: fadeUp .35s ease both; }
+    .market-card:nth-child(1){animation-delay:.04s} .market-card:nth-child(2){animation-delay:.08s}
+    .market-card:nth-child(3){animation-delay:.12s} .market-card:nth-child(4){animation-delay:.16s}
+    .market-card:nth-child(5){animation-delay:.20s} .market-card:nth-child(6){animation-delay:.24s}
+    .market-card:nth-child(7){animation-delay:.28s} .market-card:nth-child(8){animation-delay:.32s}
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      header, .hero, main, footer { padding-left: 16px; padding-right: 16px; }
+      .tabs { padding: 0 8px; }
+      .tab { padding: 12px 10px; font-size: 13px; }
       .markets-grid { grid-template-columns: 1fr; }
-      header { padding: 0 16px; }
-      main, .hero, .tabs { padding-left: 16px; padding-right: 16px; }
-      .hero h1 { font-size: 26px; }
+      .hero h1 { font-size: 22px; }
     }
-
-    /* ---- FADE IN ---- */
-    .market-card {
-      animation: fadeUp 0.4s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .market-card:nth-child(1)  { animation-delay: 0.05s; }
-    .market-card:nth-child(2)  { animation-delay: 0.10s; }
-    .market-card:nth-child(3)  { animation-delay: 0.15s; }
-    .market-card:nth-child(4)  { animation-delay: 0.20s; }
-    .market-card:nth-child(5)  { animation-delay: 0.25s; }
-    .market-card:nth-child(6)  { animation-delay: 0.30s; }
   </style>
 </head>
 <body>
 
 <header>
   <a class="logo" href="/">Politi<span>Market</span></a>
-  <div class="header-meta">
-    <span class="live-dot">Données en direct</span>
+  <div class="header-right">
+    <span class="live-badge">En direct</span>
     <span class="last-update" id="lastUpdate">—</span>
   </div>
 </header>
 
 <div class="hero">
-  <p class="hero-label">Marchés de prédiction · Polymarket</p>
-  <h1>Ce que les marchés pensent <em>vraiment</em> de la politique</h1>
-  <p class="hero-sub">
-    Les probabilités affichées proviennent de <a href="https://polymarket.com" target="_blank" rel="noopener">Polymarket</a>,
-    où des milliers de traders parient réellement sur les issues politiques.
-    Contrairement aux sondages, ici l'argent est en jeu.
-  </p>
+  <div class="hero-inner">
+    <span class="hero-tag">Marchés de prédiction · Polymarket</span>
+    <h1>Ce que les marchés pensent de la politique</h1>
+    <p class="hero-sub">
+      Les probabilités proviennent de <a href="https://polymarket.com" target="_blank">Polymarket</a>,
+      où des milliers de traders parient réellement sur les issues politiques et économiques.
+      Contrairement aux sondages, ici l'argent est en jeu.
+    </p>
+  </div>
 </div>
 
-<div class="tabs">
-  <button class="tab active" data-tab="surveillance">🎯 Surveillance</button>
-  <button class="tab" data-tab="top">🔥 Top marchés</button>
-  <button class="tab" data-tab="europe">🇪🇺 Europe</button>
-  <button class="tab" data-tab="macro">📉 Macro</button>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="surveillance">🎯 Surveillance</button>
+    <button class="tab" data-tab="top">🔥 Top marchés</button>
+    <button class="tab" data-tab="europe">🇪🇺 Europe</button>
+    <button class="tab" data-tab="macro">📉 Macro</button>
+    <button class="tab" data-tab="bourse">📈 Bourse</button>
+    <button class="tab" data-tab="semaine">📰 Résumé semaine</button>
+  </div>
 </div>
 
 <main>
 
-  <!-- TAB: SURVEILLANCE -->
+  <!-- SURVEILLANCE -->
   <div id="tab-surveillance" class="tab-panel active">
     <div class="info-banner">
       <span>ℹ️</span>
-      <span><strong>Comment lire ces données :</strong> Une probabilité de 88% signifie que les traders parient à 88¢ pour gagner 1$ si l'événement se produit. Cache rafraîchi toutes les 15 minutes.</span>
+      <span><strong>Comment lire :</strong> Une probabilité de 80% signifie que les traders paient 80¢ pour gagner 1$ si l'événement se produit. Données mises à jour toutes les 15 minutes. Cliquez sur une carte pour voir le marché sur Polymarket.</span>
     </div>
-
     <div class="section-title">🇺🇸 Midterms 2026</div>
-    <div class="markets-grid" id="grid-midterms">
-      <div class="loading-state"><div class="spinner"></div><br>Chargement des marchés…</div>
-    </div>
-
-    <div class="section-title">🇺🇸 Trump</div>
-    <div class="markets-grid" id="grid-trump">
-      <div class="loading-state"><div class="spinner"></div></div>
-    </div>
+    <div class="markets-grid" id="grid-midterms"><div class="loading-state"><div class="spinner"></div><br>Chargement…</div></div>
+    <div class="section-title">🇺🇸 Trump &amp; politique US</div>
+    <div class="markets-grid" id="grid-trump"><div class="loading-state"><div class="spinner"></div></div></div>
   </div>
 
-  <!-- TAB: TOP -->
+  <!-- TOP -->
   <div id="tab-top" class="tab-panel">
     <div class="section-title">Top marchés politiques par volume</div>
-    <div id="top-markets-container">
-      <div class="loading-state"><div class="spinner"></div><br>Chargement…</div>
-    </div>
+    <div id="top-markets-container"><div class="loading-state"><div class="spinner"></div><br>Chargement…</div></div>
   </div>
 
-  <!-- TAB: EUROPE -->
+  <!-- EUROPE -->
   <div id="tab-europe" class="tab-panel">
-    <div class="section-title">🇪🇺 Politique européenne</div>
-    <div class="markets-grid" id="grid-europe">
-      <div class="loading-state"><div class="spinner"></div><br>Chargement…</div>
-    </div>
+    <div class="section-title">🇫🇷 France</div>
+    <div class="markets-grid" id="grid-france"><div class="loading-state"><div class="spinner"></div></div></div>
+    <div class="section-title">🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe</div>
+    <div class="markets-grid" id="grid-europe"><div class="loading-state"><div class="spinner"></div></div></div>
   </div>
 
-  <!-- TAB: MACRO -->
+  <!-- MACRO -->
   <div id="tab-macro" class="tab-panel">
-    <div class="section-title">📉 Macro & Marchés financiers</div>
-    <div class="markets-grid" id="grid-macro">
-      <div class="loading-state"><div class="spinner"></div><br>Chargement…</div>
+    <div class="section-title">📉 Économie &amp; Banques centrales</div>
+    <div class="markets-grid" id="grid-macro"><div class="loading-state"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- BOURSE -->
+  <div id="tab-bourse" class="tab-panel">
+    <div class="info-banner">
+      <span>📈</span>
+      <span><strong>Marchés financiers :</strong> Ces paris portent sur l'évolution des grands indices boursiers, matières premières et cryptos. Un outil unique pour mesurer le sentiment de marché en temps réel.</span>
     </div>
+    <div class="section-title">📊 Indices boursiers</div>
+    <div class="markets-grid" id="grid-indices"><div class="loading-state"><div class="spinner"></div></div></div>
+    <div class="section-title">🥇 Matières premières &amp; Crypto</div>
+    <div class="markets-grid" id="grid-commodities"><div class="loading-state"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- SEMAINE -->
+  <div id="tab-semaine" class="tab-panel">
+    <div class="semaine-header">
+      <h2>📰 Résumé de la semaine</h2>
+      <p>Les marchés les plus mouvementés des 7 derniers jours — prêt à copier pour votre newsletter Substack.</p>
+    </div>
+    <div id="semaine-content"><div class="loading-state"><div class="spinner"></div><br>Calcul des mouvements…</div></div>
   </div>
 
 </main>
 
 <footer>
-  <p>Données : <a href="https://polymarket.com" target="_blank">Polymarket</a> via API publique · Cache 15 min · Prix en USD · Pas un conseil financier</p>
-  <p style="margin-top:6px">Un projet de <a href="https://investir.blog" target="_blank">investir.blog</a></p>
+  <p>Données : <a href="https://polymarket.com" target="_blank">Polymarket</a> via API publique · Cache 15 min · Montants en USD · Pas un conseil en investissement</p>
+  <p style="margin-top:4px">Un projet de <a href="https://investir.blog" target="_blank">investir.blog</a></p>
 </footer>
 
 <script>
-// ============================================================
-//  PolitiMarket — client JS
-//  Appelle /.netlify/functions/polymarket?action=dashboard
-// ============================================================
+// ================================================================
+//  PolitiMarket — JS v2
+// ================================================================
 
 const API = '/.netlify/functions/polymarket';
 
-// -- Données de démo pour dev local (quand l'API n'est pas dispo)
-const DEMO_DATA = {
-  watched: [
-    {
-      slug: "republicans-win-house-2026",
-      label: "GOP remporte la Chambre (2026)",
-      category: "🇺🇸 Midterms 2026",
-      emoji: "🏛️",
-      market: {
-        question: "Republicans win the House in 2026?",
-        outcomePrices: "[0.12, 0.88]",
-        outcomes: '["Yes","No"]',
-        volume: 4200000,
-        endDate: "2026-11-04T00:00:00Z",
-      }
-    },
-    {
-      slug: "republicans-win-senate-2026",
-      label: "GOP remporte le Sénat (2026)",
-      category: "🇺🇸 Midterms 2026",
-      emoji: "🏛️",
-      market: {
-        question: "Republicans win the Senate in 2026?",
-        outcomePrices: "[0.49, 0.51]",
-        outcomes: '["Yes","No"]',
-        volume: 3100000,
-        endDate: "2026-11-04T00:00:00Z",
-      }
-    },
-    {
-      slug: "trump-impeached",
-      label: "Trump mis en accusation",
-      category: "🇺🇸 Trump",
-      emoji: "⚖️",
-      market: {
-        question: "Will Trump be impeached before end of term?",
-        outcomePrices: "[0.07, 0.93]",
-        outcomes: '["Yes","No"]',
-        volume: 1800000,
-        endDate: "2029-01-20T00:00:00Z",
-      }
-    },
-    {
-      slug: "us-recession-2025",
-      label: "Récession US en 2025",
-      category: "📉 Macro",
-      emoji: "📉",
-      market: {
-        question: "US recession in 2025?",
-        outcomePrices: "[0.61, 0.39]",
-        outcomes: '["Yes","No"]',
-        volume: 9700000,
-        endDate: "2025-12-31T00:00:00Z",
-      }
-    },
-    {
-      slug: "fed-cut-rates-june-2026",
-      label: "Fed baisse ses taux en juin 2026",
-      category: "📉 Macro",
-      emoji: "🏦",
-      market: {
-        question: "Will the Fed cut rates at the June 2026 FOMC?",
-        outcomePrices: "[0.34, 0.66]",
-        outcomes: '["Yes","No"]',
-        volume: 5500000,
-        endDate: "2026-06-18T00:00:00Z",
-      }
-    },
-    {
-      slug: "marine-le-pen-wins-2027",
-      label: "Le Pen gagne la présidentielle 2027",
-      category: "🇪🇺 Europe",
-      emoji: "🇫🇷",
-      market: {
-        question: "Marine Le Pen wins the 2027 French Presidential Election?",
-        outcomePrices: "[0.38, 0.62]",
-        outcomes: '["Yes","No"]',
-        volume: 2200000,
-        endDate: "2027-05-10T00:00:00Z",
-      }
-    },
-  ],
-  top: [
-    { slug: "us-recession-2025", question: "US recession in 2025?", outcomePrices: "[0.61, 0.39]", volume: 9700000, endDate: "2025-12-31" },
-    { slug: "republicans-win-house-2026", question: "Republicans win the House in 2026?", outcomePrices: "[0.12, 0.88]", volume: 4200000, endDate: "2026-11-04" },
-    { slug: "fed-cut-june-2026", question: "Will the Fed cut rates at the June 2026 FOMC?", outcomePrices: "[0.34, 0.66]", volume: 5500000, endDate: "2026-06-18" },
-    { slug: "marine-le-pen-2027", question: "Marine Le Pen wins the 2027 French Presidential?", outcomePrices: "[0.38, 0.62]", volume: 2200000, endDate: "2027-05-10" },
-    { slug: "trump-impeached", question: "Will Trump be impeached?", outcomePrices: "[0.07, 0.93]", volume: 1800000, endDate: "2029-01-20" },
-  ],
-  cachedAt: new Date().toISOString(),
-};
+// ---- Données de démo ----
+const DEMO = { watched: [
+  // Midterms
+  { slug:"republicans-win-house-2026",    label:"GOP remporte la Chambre (2026)",      category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.12,0.88]", volume:4200000, endDate:"2026-11-04" } },
+  { slug:"democrats-win-house-2026",      label:"Dems remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.88,0.12]", volume:3800000, endDate:"2026-11-04" } },
+  { slug:"republicans-win-senate-2026",   label:"GOP remporte le Sénat (2026)",        category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.49,0.51]", volume:3100000, endDate:"2026-11-04" } },
+  { slug:"democrats-win-senate-2026",     label:"Dems remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.51,0.49]", volume:2900000, endDate:"2026-11-04" } },
+  // Trump
+  { slug:"trump-impeached",               label:"Trump mis en accusation",              category:"🇺🇸 Trump & politique US",        emoji:"⚖️", market:{ outcomePrices:"[0.07,0.93]", volume:1800000, endDate:"2029-01-20" } },
+  { slug:"trump-approval-above-50",       label:"Cote de Trump dépasse 50%",           category:"🇺🇸 Trump & politique US",        emoji:"📊", market:{ outcomePrices:"[0.22,0.78]", volume:1100000, endDate:"2026-12-31" } },
+  { slug:"trump-tariffs-paused-2025",     label:"Trump suspend ses tarifs douaniers",  category:"🇺🇸 Trump & politique US",        emoji:"🚢", market:{ outcomePrices:"[0.61,0.39]", volume:6200000, endDate:"2025-12-31" } },
+  { slug:"us-mexico-border-closed",       label:"Frontière USA-Mexique fermée",        category:"🇺🇸 Trump & politique US",        emoji:"🛂", market:{ outcomePrices:"[0.14,0.86]", volume:900000,  endDate:"2025-12-31" } },
+  // France
+  { slug:"le-pen-wins-2027",              label:"Le Pen gagne la présidentielle 2027", category:"🇫🇷 France",                      emoji:"🇫🇷", market:{ outcomePrices:"[0.38,0.62]", volume:2200000, endDate:"2027-05-10" } },
+  { slug:"macron-resigns-2026",           label:"Macron démissionne en 2026",          category:"🇫🇷 France",                      emoji:"🇫🇷", market:{ outcomePrices:"[0.11,0.89]", volume:800000,  endDate:"2026-12-31" } },
+  { slug:"france-snap-election-2026",     label:"Élections anticipées en France 2026", category:"🇫🇷 France",                      emoji:"🗳️", market:{ outcomePrices:"[0.29,0.71]", volume:1400000, endDate:"2026-12-31" } },
+  // Europe
+  { slug:"germany-afd-wins-election",     label:"L'AfD remporte les élections all.",   category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🇩🇪", market:{ outcomePrices:"[0.18,0.82]", volume:1600000, endDate:"2025-09-28" } },
+  { slug:"uk-general-election-2029",      label:"Élections UK avant 2029",             category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🇬🇧", market:{ outcomePrices:"[0.08,0.92]", volume:650000,  endDate:"2029-01-01" } },
+  { slug:"eu-breaks-up-2030",             label:"Un pays quitte l'UE avant 2030",      category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🇪🇺", market:{ outcomePrices:"[0.05,0.95]", volume:420000,  endDate:"2030-01-01" } },
+  { slug:"ukraine-ceasefire-2025",        label:"Cessez-le-feu Ukraine en 2025",       category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🕊️", market:{ outcomePrices:"[0.72,0.28]", volume:8900000, endDate:"2025-12-31" } },
+  // Macro
+  { slug:"us-recession-2025",             label:"Récession US en 2025",                category:"📉 Économie & Banques centrales", emoji:"📉", market:{ outcomePrices:"[0.61,0.39]", volume:9700000, endDate:"2025-12-31" } },
+  { slug:"fed-cut-rates-june-2026",       label:"Fed baisse ses taux en juin 2026",    category:"📉 Économie & Banques centrales", emoji:"🏦", market:{ outcomePrices:"[0.34,0.66]", volume:5500000, endDate:"2026-06-18" } },
+  { slug:"ecb-rate-cut-q2-2026",          label:"BCE baisse ses taux au T2 2026",      category:"📉 Économie & Banques centrales", emoji:"🏦", market:{ outcomePrices:"[0.55,0.45]", volume:2100000, endDate:"2026-06-30" } },
+  { slug:"us-unemployment-above-5",       label:"Chômage US dépasse 5% en 2025",       category:"📉 Économie & Banques centrales", emoji:"📊", market:{ outcomePrices:"[0.43,0.57]", volume:3200000, endDate:"2025-12-31" } },
+  { slug:"inflation-us-above-4-2025",     label:"Inflation US dépasse 4% en 2025",     category:"📉 Économie & Banques centrales", emoji:"🛒", market:{ outcomePrices:"[0.28,0.72]", volume:1800000, endDate:"2025-12-31" } },
+  // Indices
+  { slug:"sp500-above-6000-end-2025",     label:"S&P 500 au-dessus de 6 000 fin 2025", category:"📊 Indices boursiers",            emoji:"📈", market:{ outcomePrices:"[0.47,0.53]", volume:7800000, endDate:"2025-12-31" } },
+  { slug:"sp500-above-5000-end-2025",     label:"S&P 500 au-dessus de 5 000 fin 2025", category:"📊 Indices boursiers",            emoji:"📈", market:{ outcomePrices:"[0.72,0.28]", volume:5600000, endDate:"2025-12-31" } },
+  { slug:"nasdaq-bear-market-2025",       label:"Nasdaq en bear market en 2025",        category:"📊 Indices boursiers",            emoji:"🐻", market:{ outcomePrices:"[0.38,0.62]", volume:4100000, endDate:"2025-12-31" } },
+  { slug:"cac40-above-8000-end-2025",     label:"CAC 40 au-dessus de 8 000 fin 2025",  category:"📊 Indices boursiers",            emoji:"🇫🇷", market:{ outcomePrices:"[0.41,0.59]", volume:980000,  endDate:"2025-12-31" } },
+  // Commodities & crypto
+  { slug:"gold-above-3000-2025",          label:"Or dépasse 3 000 $/oz en 2025",       category:"🥇 Matières premières & Crypto",  emoji:"🥇", market:{ outcomePrices:"[0.78,0.22]", volume:6400000, endDate:"2025-12-31" } },
+  { slug:"oil-brent-above-100-2025",      label:"Pétrole Brent dépasse 100$ en 2025",  category:"🥇 Matières premières & Crypto",  emoji:"🛢️", market:{ outcomePrices:"[0.19,0.81]", volume:3300000, endDate:"2025-12-31" } },
+  { slug:"bitcoin-above-100k-2025",       label:"Bitcoin dépasse 100 000$ en 2025",    category:"🥇 Matières premières & Crypto",  emoji:"₿",  market:{ outcomePrices:"[0.65,0.35]", volume:12000000,endDate:"2025-12-31" } },
+  { slug:"bitcoin-above-150k-2025",       label:"Bitcoin dépasse 150 000$ en 2025",    category:"🥇 Matières premières & Crypto",  emoji:"₿",  market:{ outcomePrices:"[0.31,0.69]", volume:8200000, endDate:"2025-12-31" } },
+], history: {
+  "republicans-win-house-2026":    [0.18,0.16,0.15,0.14,0.13,0.12,0.12],
+  "democrats-win-house-2026":      [0.82,0.84,0.85,0.86,0.87,0.88,0.88],
+  "trump-tariffs-paused-2025":     [0.45,0.48,0.52,0.55,0.58,0.60,0.61],
+  "us-recession-2025":             [0.52,0.54,0.56,0.57,0.59,0.60,0.61],
+  "ukraine-ceasefire-2025":        [0.68,0.70,0.71,0.71,0.72,0.72,0.72],
+  "bitcoin-above-100k-2025":       [0.58,0.60,0.63,0.64,0.65,0.65,0.65],
+  "gold-above-3000-2025":          [0.68,0.70,0.72,0.74,0.75,0.77,0.78],
+  "sp500-above-6000-end-2025":     [0.55,0.53,0.51,0.50,0.49,0.48,0.47],
+  "le-pen-wins-2027":              [0.35,0.35,0.36,0.37,0.37,0.38,0.38],
+  "fed-cut-rates-june-2026":       [0.28,0.29,0.30,0.31,0.32,0.33,0.34],
+  "ecb-rate-cut-q2-2026":          [0.62,0.60,0.58,0.57,0.56,0.55,0.55],
+  "nasdaq-bear-market-2025":       [0.28,0.30,0.32,0.34,0.36,0.37,0.38],
+}, top: [], cachedAt: new Date().toISOString() };
 
-// -- Utilitaires --
+DEMO.top = [...DEMO.watched]
+  .sort((a,b) => (b.market.volume||0) - (a.market.volume||0))
+  .slice(0,12)
+  .map(d => ({ slug:d.slug, question:d.label, outcomePrices:d.market.outcomePrices, volume:d.market.volume, endDate:d.market.endDate }));
 
+// ---- Utilitaires ----
 function parsePrices(raw) {
-  try {
-    const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return arr.map(Number);
-  } catch { return [0.5, 0.5]; }
+  try { return (typeof raw==='string' ? JSON.parse(raw) : raw).map(Number); }
+  catch { return [0.5,0.5]; }
 }
-
-function formatVolume(v) {
+function formatVol(v) {
   if (!v) return '—';
-  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000)     return `$${(v / 1_000).toFixed(0)}k`;
+  if (v>=1e6) return `$${(v/1e6).toFixed(1)}M`;
+  if (v>=1e3) return `$${(v/1e3).toFixed(0)}k`;
   return `$${v}`;
 }
-
 function formatDate(d) {
   if (!d) return '—';
-  try {
-    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
-      .format(new Date(d));
-  } catch { return d.slice(0, 10); }
+  try { return new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short',year:'numeric'}).format(new Date(d)); }
+  catch { return String(d).slice(0,10); }
+}
+function probStyle(p) {
+  if (p>=0.65) return { cls:'c-red',    fill:'fill-red',    hex:'#c0392b' };
+  if (p>=0.40) return { cls:'c-yellow', fill:'fill-yellow', hex:'#9a6b00' };
+  return             { cls:'c-green',  fill:'fill-green',  hex:'#1e7e4a' };
 }
 
-function probColor(p) {
-  if (p >= 0.65) return 'prob-high';
-  if (p >= 0.40) return 'prob-med';
-  return 'prob-low';
+// ---- Sparklines ----
+const charts = {};
+function drawChart(id, data, hex) {
+  const el = document.getElementById(id);
+  if (!el || !data || data.length < 2) return;
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(el, {
+    type: 'line',
+    data: {
+      labels: data.map((_,i)=>`J${i-data.length+1}`),
+      datasets: [{ data: data.map(v=>Math.round(v*100)), borderColor: hex, borderWidth: 2,
+        fill: true, backgroundColor: hex+'18', tension: 0.4, pointRadius: 0, pointHoverRadius: 3 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{label:c=>c.parsed.y+'%'} } },
+      scales: {
+        x: { display: false },
+        y: { display: true, border:{display:false}, grid:{color:'rgba(0,0,0,0.05)'},
+          min: Math.max(0, Math.min(...data)*100-5),
+          max: Math.min(100, Math.max(...data)*100+5),
+          ticks: { font:{size:10}, color:'#6c757d', maxTicksLimit:3, callback:v=>v+'%' }
+        }
+      }
+    }
+  });
 }
 
-function probBarColor(p) {
-  if (p >= 0.65) return 'var(--accent)';
-  if (p >= 0.40) return 'var(--yellow)';
-  return 'var(--green)';
-}
-
-// -- Rendu d'une carte marché --
-function renderCard(def, market) {
+// ---- Carte ----
+let uid = 0;
+function renderCard(def, market, history) {
   const prices = parsePrices(market.outcomePrices);
-  const pYes = prices[0];
-  const pNo  = prices[1] ?? (1 - pYes);
-  const pct  = Math.round(pYes * 100);
-  const colorClass = probColor(pYes);
-  const barColor = probBarColor(pYes);
+  const pYes = prices[0], pNo = 1-pYes;
+  const pct  = Math.round(pYes*100);
+  const st   = probStyle(pYes);
+  const hist = history && history[def.slug];
+  const cid  = `c${++uid}`;
+
+  // Badge mouvement 7j
+  let moveBadge = '';
+  if (hist && hist.length>=2) {
+    const d = Math.round((hist[hist.length-1]-hist[0])*100);
+    const sign = d>0?'+':'';
+    const bcls = d>1?'move-up':d<-1?'move-down':'move-flat';
+    moveBadge = `<span class="move-badge ${bcls}">${sign}${d}pts 7j</span>`;
+  }
 
   const card = document.createElement('div');
   card.className = 'market-card';
-  card.style.setProperty('--bar-color', barColor);
-
+  card.style.setProperty('--card-accent', st.hex);
   card.innerHTML = `
-    <div class="card-top">
-      <span class="card-category">${def.category || ''}</span>
-      <span class="card-emoji">${def.emoji || '📊'}</span>
+    <div class="card-header">
+      <span class="card-category">${def.category||''}</span>
+      <span class="card-emoji">${def.emoji||'📊'}</span>
     </div>
-    <div class="card-question">${def.label || market.question}</div>
-
-    <div class="prob-bar-wrap">
-      <div class="prob-bar-track">
-        <div class="prob-bar-fill" style="width:0%;background:${barColor}" data-target="${pct}"></div>
-      </div>
-      <div class="prob-labels">
+    <div class="card-question">${def.label||market.question||def.slug}</div>
+    <div class="prob-section">
+      <div class="prob-row">
         <div>
-          <div class="prob-yes ${colorClass}">${pct}%</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px">Probabilité OUI</div>
+          <div class="prob-yes-val ${st.cls}">${pct}% ${moveBadge}</div>
+          <div class="prob-yes-label">Probabilité OUI</div>
         </div>
-        <div class="prob-no">NON <span>${Math.round(pNo * 100)}%</span></div>
+        <div class="prob-no-block">
+          <div class="prob-no-val">${Math.round(pNo*100)}%</div>
+          <div class="prob-no-label">NON</div>
+        </div>
+      </div>
+      <div class="prob-track">
+        <div class="prob-fill ${st.fill}" style="width:0%" data-target="${pct}"></div>
       </div>
     </div>
-
+    ${hist?`<div class="chart-wrap"><div class="chart-label">Évolution 7 jours</div><canvas id="${cid}" style="height:52px"></canvas></div>`:''}
     <div class="card-footer">
-      <span class="card-volume">Vol. <strong>${formatVolume(market.volume)}</strong></span>
+      <span class="card-vol">Vol. <strong>${formatVol(market.volume)}</strong></span>
       <span class="card-end">⏳ ${formatDate(market.endDate)}</span>
-    </div>
-  `;
+    </div>`;
 
-  // Lien vers Polymarket
-  card.addEventListener('click', () => {
-    window.open(`https://polymarket.com/event/${def.slug}`, '_blank');
-  });
-
+  card.addEventListener('click', ()=>window.open(`https://polymarket.com/event/${def.slug}`,'_blank'));
+  if (hist) requestAnimationFrame(()=>drawChart(cid, hist, st.hex));
   return card;
 }
 
-// -- Rendu tableau top marchés --
-function renderTopTable(markets) {
-  const container = document.getElementById('top-markets-container');
-  if (!markets.length) {
-    container.innerHTML = '<div class="error-state"><strong>Aucun marché disponible</strong></div>';
-    return;
-  }
-
-  const table = document.createElement('table');
-  table.className = 'top-table';
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Question</th>
-        <th>Prob. OUI</th>
-        <th>Volume</th>
-        <th>Échéance</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  `;
-
-  const tbody = table.querySelector('tbody');
-  markets.forEach((m, i) => {
-    const prices = parsePrices(m.outcomePrices);
-    const pYes = prices[0];
-    const pct = Math.round(pYes * 100);
-    const colorClass = probColor(pYes);
-    const tr = document.createElement('tr');
-    tr.style.cursor = 'pointer';
-    tr.innerHTML = `
-      <td style="color:var(--muted)">${i + 1}</td>
-      <td class="top-question">${m.question}</td>
-      <td class="top-prob ${colorClass}">${pct}%</td>
-      <td class="top-vol">${formatVolume(m.volume)}</td>
-      <td class="top-vol">${formatDate(m.endDate)}</td>
-    `;
-    tr.addEventListener('click', () => window.open(`https://polymarket.com/event/${m.slug}`, '_blank'));
-    tbody.appendChild(tr);
-  });
-
-  container.innerHTML = '';
-  container.appendChild(table);
-}
-
-// -- Animer les barres après insertion --
-function animateBars() {
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.prob-bar-fill[data-target]').forEach(el => {
-      const t = el.dataset.target;
-      setTimeout(() => { el.style.width = t + '%'; }, 50);
+// ---- Barres ----
+function animateBars(root) {
+  requestAnimationFrame(()=>{
+    (root||document).querySelectorAll('.prob-fill[data-target]').forEach(b=>{
+      setTimeout(()=>{ b.style.width = b.dataset.target+'%'; }, 80);
     });
   });
 }
 
-// -- Rendre les grilles par catégorie --
-function renderGrids(watched) {
-  const grids = {
-    '🇺🇸 Midterms 2026': document.getElementById('grid-midterms'),
-    '🇺🇸 Trump':          document.getElementById('grid-trump'),
-    '🇪🇺 Europe':         document.getElementById('grid-europe'),
-    '📉 Macro':           document.getElementById('grid-macro'),
-  };
+// ---- Grilles ----
+const GRID_MAP = {
+  '🇺🇸 Midterms 2026':              'grid-midterms',
+  '🇺🇸 Trump & politique US':        'grid-trump',
+  '🇫🇷 France':                      'grid-france',
+  '🇩🇪 🇬🇧 🇪🇺 Reste de l\'Europe': 'grid-europe',
+  '📉 Économie & Banques centrales':  'grid-macro',
+  '📊 Indices boursiers':             'grid-indices',
+  '🥇 Matières premières & Crypto':   'grid-commodities',
+};
 
-  // Vider
-  Object.values(grids).forEach(g => { if (g) g.innerHTML = ''; });
-
-  watched.forEach(item => {
-    const grid = grids[item.category];
-    if (!grid) return;
-    const card = renderCard(item, item.market);
-    grid.appendChild(card);
+function renderGrids(watched, history) {
+  Object.values(GRID_MAP).forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
+  watched.forEach(item=>{
+    const id = GRID_MAP[item.category];
+    const el = id ? document.getElementById(id) : null;
+    if (!el) return;
+    el.appendChild(renderCard(item, item.market, history));
   });
-
-  // Fallback si grille vide
-  Object.entries(grids).forEach(([cat, grid]) => {
-    if (grid && grid.children.length === 0) {
-      grid.innerHTML = `<div class="error-state" style="grid-column:1/-1"><strong>Aucun marché actif</strong><br>Les marchés pour cette catégorie ne sont pas encore disponibles sur Polymarket.</div>`;
-    }
+  Object.values(GRID_MAP).forEach(id=>{
+    const g = document.getElementById(id);
+    if (g && g.children.length===0)
+      g.innerHTML = `<div class="error-state" style="grid-column:1/-1"><strong>Aucun marché disponible</strong><br>Cette catégorie sera enrichie prochainement.</div>`;
   });
-
   animateBars();
 }
 
-// -- Charger les données --
+// ---- Top table ----
+function renderTop(markets) {
+  const c = document.getElementById('top-markets-container');
+  if (!markets.length) { c.innerHTML='<div class="error-state"><strong>Pas de données</strong></div>'; return; }
+  const t = document.createElement('table');
+  t.className = 'top-table';
+  t.innerHTML = `<thead><tr><th>#</th><th>Question</th><th>Prob. OUI</th><th>Volume</th><th>Échéance</th></tr></thead><tbody></tbody>`;
+  const tb = t.querySelector('tbody');
+  markets.forEach((m,i)=>{
+    const p=parsePrices(m.outcomePrices)[0], pct=Math.round(p*100), st=probStyle(p);
+    const tr=document.createElement('tr'); tr.style.cursor='pointer';
+    tr.innerHTML=`<td style="color:var(--muted);font-weight:700">${i+1}</td><td class="top-question">${m.question}</td><td class="top-prob ${st.cls}">${pct}%</td><td class="top-vol">${formatVol(m.volume)}</td><td class="top-vol">${formatDate(m.endDate)}</td>`;
+    tr.addEventListener('click',()=>window.open(`https://polymarket.com/event/${m.slug}`,'_blank'));
+    tb.appendChild(tr);
+  });
+  c.innerHTML=''; c.appendChild(t);
+}
+
+// ---- Résumé semaine ----
+function renderSemaine(watched, history) {
+  const c = document.getElementById('semaine-content');
+  const moves = watched
+    .filter(d=>history&&history[d.slug]&&history[d.slug].length>=2)
+    .map(d=>{ const h=history[d.slug]; return {...d, delta:h[h.length-1]-h[0], pNow:h[h.length-1], p0:h[0]}; })
+    .sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)).slice(0,8);
+
+  if (!moves.length) {
+    c.innerHTML='<div class="error-state"><strong>Données insuffisantes</strong><br>L\'historique 7j sera disponible avec l\'API en direct.</div>';
+    return;
+  }
+  const dateStr = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'long',year:'numeric'}).format(new Date());
+  let html='', txt=`📊 **Marchés de prédiction — Semaine du ${dateStr}**\n\nVia Polymarket :\n\n`;
+
+  moves.forEach(m=>{
+    const d=Math.round(m.delta*100), pct=Math.round(m.pNow*100), sign=d>0?'+':'';
+    const cls=d>1?'move-up':d<-1?'move-down':'move-flat';
+    const arrow=d>1?'↑':d<-1?'↓':'→';
+    const st=probStyle(m.pNow);
+    html+=`<div class="semaine-card">
+      <div class="semaine-card-header">
+        <div class="semaine-question">${m.emoji} ${m.label}</div>
+        <div class="semaine-move ${cls}">${arrow} ${sign}${d} pts</div>
+      </div>
+      <div class="semaine-meta">
+        <span>Prob. actuelle : <strong class="${st.cls}">${pct}%</strong></span>
+        <span>Il y a 7j : ${Math.round(m.p0*100)}%</span>
+        <span>Volume : ${formatVol(m.market.volume)}</span>
+      </div>
+    </div>`;
+    txt+=`${m.emoji} **${m.label}**\n→ ${pct}% (${sign}${d} pts sur 7j)\n\n`;
+  });
+  txt+=`_Source : Polymarket · [investir.blog](https://investir.blog)_`;
+  html+=`<button class="copy-btn" id="copyBtn">📋 Copier pour Substack</button>`;
+  c.innerHTML=html;
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    navigator.clipboard.writeText(txt).then(()=>{
+      this.textContent='✅ Copié !'; this.classList.add('copied');
+      setTimeout(()=>{ this.textContent='📋 Copier pour Substack'; this.classList.remove('copied'); },2000);
+    });
+  });
+}
+
+// ---- Chargement ----
 async function loadData() {
   let data;
-
   try {
     const res = await fetch(`${API}?action=dashboard`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
-  } catch (err) {
-    console.warn('API Polymarket indisponible, utilisation des données de démo :', err.message);
-    data = DEMO_DATA;
+  } catch(e) {
+    console.warn('Mode démo :', e.message);
+    data = DEMO;
   }
-
-  // Mise à jour heure
   const ts = data.cachedAt ? new Date(data.cachedAt) : new Date();
-  document.getElementById('lastUpdate').textContent =
-    'MàJ ' + ts.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-  // Grilles
-  renderGrids(data.watched || []);
-
-  // Top marchés
-  renderTopTable(data.top || []);
+  document.getElementById('lastUpdate').textContent = 'MàJ ' + ts.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const history = data.history || DEMO.history;
+  const watched = (data.watched && data.watched.length) ? data.watched : DEMO.watched;
+  const top     = (data.top     && data.top.length)     ? data.top     : DEMO.top;
+  renderGrids(watched, history);
+  renderTop(top);
+  renderSemaine(watched, history);
 }
 
-// -- Tabs --
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+// ---- Tabs ----
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     tab.classList.add('active');
-    const panel = document.getElementById('tab-' + tab.dataset.tab);
-    if (panel) panel.classList.add('active');
+    const p = document.getElementById('tab-'+tab.dataset.tab);
+    if (p) p.classList.add('active');
     animateBars();
   });
 });
 
-// -- Init --
 loadData();
-// Rafraîchir toutes les 15 minutes
-setInterval(loadData, 15 * 60 * 1000);
+setInterval(loadData, 15*60*1000);
 </script>
 </body>
 </html>
