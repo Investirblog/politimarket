@@ -168,9 +168,15 @@
     .prob-fill { height: 100%; border-radius: 4px; transition: width .9s cubic-bezier(.4,0,.2,1); }
 
     /* SPARKLINE */
-    .chart-wrap { margin: 14px 0 10px; position: relative; height: 60px; }
+    .chart-wrap { margin: 14px 0 10px; position: relative; height: 96px; }
     .chart-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-    .chart-wrap canvas { position: absolute; top: 18px; left: 0; width: 100% !important; height: 42px !important; }
+    .chart-wrap canvas { position: absolute; top: 18px; left: 0; width: 100% !important; height: 78px !important; }
+    .chart-no-data {
+      position: absolute; top: 18px; left: 0; right: 0; height: 78px;
+      background: var(--bg2); border-radius: 6px; border: 1px dashed var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--border);
+    }
 
     /* MOVE BADGE */
     .move-badge {
@@ -495,7 +501,7 @@ function drawChart(id, data, hex) {
         y: { display: true, border:{display:false}, grid:{color:'rgba(0,0,0,0.05)'},
           min: Math.max(0, Math.min(...data)*100-5),
           max: Math.min(100, Math.max(...data)*100+5),
-          ticks: { font:{size:10}, color:'#6c757d', maxTicksLimit:3, callback:v=>v+'%' }
+          ticks: { font:{size:10}, color:'#6c757d', maxTicksLimit:4, callback:v=>v+'%' }
         }
       }
     }
@@ -545,7 +551,10 @@ function renderCard(def, market, history) {
         <div class="prob-fill ${st.fill}" style="width:0%" data-target="${pct}"></div>
       </div>
     </div>
-    ${hist?`<div class="chart-wrap"><div class="chart-label">Évolution 7 jours</div><canvas id="${cid}" width="300" height="42"></canvas></div>`:''}
+    ${hist
+      ? `<div class="chart-wrap"><div class="chart-label">Évolution 7 jours</div><canvas id="${cid}" width="300" height="78"></canvas></div>`
+      : `<div class="chart-wrap chart-empty"><div class="chart-label">Évolution 7 jours</div><div class="chart-no-data">Historique non disponible</div></div>`
+    }
     <div class="card-footer">
       <span class="card-vol">Vol. <strong>${formatVol(market.volume)}</strong></span>
       <span class="card-end">⏳ ${formatDate(market.endDate)}</span>
