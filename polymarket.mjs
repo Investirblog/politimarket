@@ -21,21 +21,49 @@ function toCache(key, data) {
   cache.set(key, { ts: Date.now(), data });
 }
 
-// Marchés politiques à surveiller (slugs Polymarket)
-// Format: { slug, label, category, emoji }
+// Marchés politiques à surveiller
 const WATCHED_MARKETS = [
-  // US politique
-  { slug: "republicans-win-house-2026",           label: "GOP remporte la Chambre (2026)",     category: "🇺🇸 Midterms 2026", emoji: "🏛️" },
-  { slug: "republicans-win-senate-2026",          label: "GOP remporte le Sénat (2026)",       category: "🇺🇸 Midterms 2026", emoji: "🏛️" },
-  { slug: "democrats-win-house-2026",             label: "Démocrates remportent la Chambre",   category: "🇺🇸 Midterms 2026", emoji: "🏛️" },
-  { slug: "trump-approval-above-50-q2-2026",      label: "Cote de Trump > 50% au T2 2026",     category: "🇺🇸 Trump", emoji: "📊" },
-  { slug: "trump-impeached",                      label: "Trump mis en accusation",             category: "🇺🇸 Trump", emoji: "⚖️" },
-  { slug: "us-recession-2025",                    label: "Récession US en 2025",                category: "📉 Macro", emoji: "📉" },
-  { slug: "fed-cut-rates-june-2026",              label: "Fed baisse ses taux en juin 2026",   category: "📉 Macro", emoji: "🏦" },
+  // Midterms
+  { slug:"republicans-win-house-2026",     label:"Républicains remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"democrats-win-house-2026",       label:"Démocrates remportent la Chambre (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"republicans-win-senate-2026",    label:"Républicains remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"democrats-win-senate-2026",      label:"Démocrates remportent le Sénat (2026)",       category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  // Trump
+  { slug:"trump-impeached",                label:"Trump mis en accusation",                     category:"🇺🇸 Trump & politique US",             emoji:"⚖️" },
+  { slug:"trump-approval-above-50",        label:"Cote de Trump dépasse 50%",                  category:"🇺🇸 Trump & politique US",             emoji:"📊" },
+  { slug:"trump-tariffs-paused-2026",      label:"Trump suspend ses tarifs douaniers",          category:"🇺🇸 Trump & politique US",             emoji:"🚢" },
+  // France
+  { slug:"le-pen-wins-2027",               label:"Le Pen gagne la présidentielle 2027",         category:"🇫🇷 France",                           emoji:"🇫🇷" },
+  { slug:"macron-resigns-2026",            label:"Macron démissionne en 2026",                  category:"🇫🇷 France",                           emoji:"🇫🇷" },
+  { slug:"france-snap-election-2026",      label:"Élections législatives anticipées en France", category:"🇫🇷 France",                           emoji:"🗳️" },
   // Europe
-  { slug: "marine-le-pen-wins-2027-french-presidential-election", label: "Le Pen gagne la présidentielle 2027", category: "🇪🇺 Europe", emoji: "🇫🇷" },
-  { slug: "macron-resigns-2026",                  label: "Macron démissionne en 2026",         category: "🇪🇺 Europe", emoji: "🇫🇷" },
-  { slug: "germany-snap-election-2025",           label: "Élections anticipées en Allemagne",  category: "🇪🇺 Europe", emoji: "🇩🇪" },
+  { slug:"ukraine-ceasefire-2026",         label:"Cessez-le-feu en Ukraine en 2026",            category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🕊️" },
+  { slug:"germany-far-right-coalition",    label:"Coalition d'extrême droite en Allemagne",     category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🇩🇪" },
+  { slug:"eu-breaks-up-2030",              label:"Un pays quitte l'Union européenne avant 2030",category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🇪🇺" },
+  // Macro
+  { slug:"us-recession-2026",              label:"Récession aux États-Unis en 2026",            category:"📉 Économie & Banques centrales",       emoji:"📉" },
+  { slug:"fed-cut-rates-june-2026",        label:"La Fed baisse ses taux en juin 2026",         category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+  { slug:"ecb-rate-cut-q2-2026",           label:"La BCE baisse ses taux au T2 2026",           category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+  { slug:"us-unemployment-above-5",        label:"Chômage US dépasse 5% en 2026",               category:"📉 Économie & Banques centrales",       emoji:"📊" },
+  // Indices
+  { slug:"sp500-above-6000-end-2026",      label:"S&P 500 au-dessus de 6 000 fin 2026",         category:"📊 Indices boursiers",                  emoji:"📈" },
+  { slug:"sp500-bear-market-2026",         label:"S&P 500 en bear market en 2026",              category:"📊 Indices boursiers",                  emoji:"🐻" },
+  { slug:"nasdaq-bear-market-2026",        label:"Nasdaq en bear market en 2026",               category:"📊 Indices boursiers",                  emoji:"🐻" },
+  { slug:"cac40-above-8000-end-2026",      label:"CAC 40 au-dessus de 8 000 fin 2026",          category:"📊 Indices boursiers",                  emoji:"🇫🇷" },
+  // Commodities
+  { slug:"gold-above-3500-2026",           label:"Or dépasse 3 500 $/oz en 2026",               category:"🥇 Matières premières & Crypto",        emoji:"🥇" },
+  { slug:"oil-brent-above-90-2026",        label:"Pétrole Brent dépasse 90$ en 2026",           category:"🥇 Matières premières & Crypto",        emoji:"🛢️" },
+  { slug:"bitcoin-above-100k-2026",        label:"Bitcoin dépasse 100 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
+  { slug:"bitcoin-above-200k-2026",        label:"Bitcoin dépasse 200 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
+  // Géopolitique
+  { slug:"israel-iran-war-2026",           label:"Conflit militaire direct Israël-Iran en 2026",category:"🌍 Géopolitique",                       emoji:"⚔️" },
+  { slug:"north-korea-missile-2026",       label:"Tir de missile nord-coréen vers le Japon",   category:"🌍 Géopolitique",                       emoji:"🚀" },
+  { slug:"taiwan-crisis-2026",             label:"Crise militaire dans le détroit de Taïwan",  category:"🌍 Géopolitique",                       emoji:"🇹🇼" },
+  { slug:"iran-nuclear-deal-2026",         label:"Accord nucléaire avec l'Iran en 2026",       category:"🌍 Géopolitique",                       emoji:"☢️" },
+  // Tech & IA
+  { slug:"openai-ipo-2026",               label:"Introduction en bourse d'OpenAI en 2026",    category:"💻 Tech & Intelligence artificielle",   emoji:"🤖" },
+  { slug:"ai-regulation-us-2026",         label:"Loi fédérale sur l'IA aux États-Unis en 2026",category:"💻 Tech & Intelligence artificielle",  emoji:"⚖️" },
+  { slug:"elon-musk-leaves-doge-2026",    label:"Elon Musk quitte le DOGE en 2026",           category:"💻 Tech & Intelligence artificielle",   emoji:"🚀" },
 ];
 
 async function fetchMarket(slug) {
@@ -132,9 +160,31 @@ export default async function handler(req) {
         fetchTopPoliticsMarkets(20),
       ]);
 
+      // Historique 7j pour les marchés qui ont un tokenId
+      const historyMap = {};
+      await Promise.all(
+        watchedResults
+          .filter(r => r.market && r.market.clobTokenIds)
+          .map(async r => {
+            try {
+              const ids = JSON.parse(r.market.clobTokenIds);
+              const tokenId = ids[0];
+              const hist = await fetchPriceHistory(tokenId);
+              if (hist && hist.length >= 2) {
+                // Extraire juste les prix (un point par jour sur 7j)
+                const step = Math.floor(hist.length / 7) || 1;
+                historyMap[r.slug] = hist
+                  .filter((_, i) => i % step === 0)
+                  .slice(-7)
+                  .map(h => parseFloat(h.p));
+              }
+            } catch {}
+          })
+      );
+
       return new Response(JSON.stringify({
         watched: watchedResults.filter(m => m.market !== null),
-        top: topMarkets.slice(0, 10).map(m => ({
+        top: topMarkets.slice(0, 12).map(m => ({
           slug: m.slug,
           question: m.question,
           outcomePrices: m.outcomePrices,
@@ -142,6 +192,7 @@ export default async function handler(req) {
           volume: m.volume,
           endDate: m.endDate,
         })),
+        history: historyMap,
         cachedAt: new Date().toISOString(),
       }), { status: 200, headers });
     }
