@@ -423,76 +423,133 @@
 //  PolitiMarket — JS v2
 // ================================================================
 
-const API = '/.netlify/functions/polymarket';
+const GAMMA = 'https://gamma-api.polymarket.com';
 
-// ---- Données de démo (affichées si la Function Netlify n'est pas disponible) ----
-// Probabilités approximatives basées sur Polymarket — avril 2026
-const DEMO = { watched: [
-  // Midterms
-  { slug:"republicans-win-house-2026",    label:"Républicains remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.12,0.88]", volume:4200000, endDate:"2026-11-04" } },
-  { slug:"democrats-win-house-2026",      label:"Démocrates remportent la Chambre (2026)",     category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.88,0.12]", volume:3800000, endDate:"2026-11-04" } },
-  { slug:"republicans-win-senate-2026",   label:"Républicains remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.49,0.51]", volume:3100000, endDate:"2026-11-04" } },
-  { slug:"democrats-win-senate-2026",     label:"Démocrates remportent le Sénat (2026)",       category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.51,0.49]", volume:2900000, endDate:"2026-11-04" } },
-  // Trump
-  { slug:"trump-impeached",               label:"Trump mis en accusation",                      category:"🇺🇸 Trump & politique US",        emoji:"⚖️", market:{ outcomePrices:"[0.07,0.93]", volume:1800000, endDate:"2029-01-20" } },
-  { slug:"trump-approval-above-50",       label:"Cote de Trump dépasse 50%",                   category:"🇺🇸 Trump & politique US",        emoji:"📊", market:{ outcomePrices:"[0.19,0.81]", volume:1100000, endDate:"2026-12-31" } },
-  { slug:"us-tariffs-remain-2026",        label:"Tarifs douaniers US maintenus jusqu'en 2027",  category:"🇺🇸 Trump & politique US",        emoji:"🚢", market:{ outcomePrices:"[0.72,0.28]", volume:6200000, endDate:"2026-12-31" } },
-  { slug:"us-mexico-canada-deal-2026",    label:"Accord commercial USA-Canada-Mexique en 2026", category:"🇺🇸 Trump & politique US",        emoji:"🤝", market:{ outcomePrices:"[0.38,0.62]", volume:900000,  endDate:"2026-12-31" } },
-  // France
-  { slug:"le-pen-wins-2027",              label:"Le Pen gagne la présidentielle 2027",          category:"🇫🇷 France",                      emoji:"🇫🇷", market:{ outcomePrices:"[0.38,0.62]", volume:2200000, endDate:"2027-05-10" } },
-  { slug:"macron-resigns-2026",           label:"Macron démissionne en 2026",                   category:"🇫🇷 France",                      emoji:"🇫🇷", market:{ outcomePrices:"[0.11,0.89]", volume:800000,  endDate:"2026-12-31" } },
-  { slug:"france-snap-election-2026",     label:"Élections législatives anticipées en France",  category:"🇫🇷 France",                      emoji:"🗳️", market:{ outcomePrices:"[0.29,0.71]", volume:1400000, endDate:"2026-12-31" } },
-  // Europe
-  { slug:"ukraine-ceasefire-2026",        label:"Cessez-le-feu en Ukraine en 2026",             category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🕊️", market:{ outcomePrices:"[0.55,0.45]", volume:8900000, endDate:"2026-12-31" } },
-  { slug:"germany-coalition-2026",        label:"Coalition stable formée en Allemagne",         category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🇩🇪", market:{ outcomePrices:"[0.71,0.29]", volume:1600000, endDate:"2026-06-30" } },
-  { slug:"eu-breaks-up-2030",             label:"Un pays quitte l'Union européenne avant 2030", category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe", emoji:"🇪🇺", market:{ outcomePrices:"[0.05,0.95]", volume:420000,  endDate:"2030-01-01" } },
-  // Macro
-  { slug:"us-recession-2026",             label:"Récession aux États-Unis en 2026",             category:"📉 Économie & Banques centrales", emoji:"📉", market:{ outcomePrices:"[0.61,0.39]", volume:9700000, endDate:"2026-12-31" } },
-  { slug:"fed-cut-rates-june-2026",       label:"La Fed baisse ses taux en juin 2026",          category:"📉 Économie & Banques centrales", emoji:"🏦", market:{ outcomePrices:"[0.34,0.66]", volume:5500000, endDate:"2026-06-18" } },
-  { slug:"ecb-rate-cut-q2-2026",          label:"La BCE baisse ses taux au T2 2026",            category:"📉 Économie & Banques centrales", emoji:"🏦", market:{ outcomePrices:"[0.55,0.45]", volume:2100000, endDate:"2026-06-30" } },
-  { slug:"us-unemployment-above-5",       label:"Chômage US dépasse 5% en 2026",               category:"📉 Économie & Banques centrales", emoji:"📊", market:{ outcomePrices:"[0.43,0.57]", volume:3200000, endDate:"2026-12-31" } },
-  { slug:"inflation-us-above-4-2026",     label:"Inflation US dépasse 4% en 2026",             category:"📉 Économie & Banques centrales", emoji:"🛒", market:{ outcomePrices:"[0.41,0.59]", volume:1800000, endDate:"2026-12-31" } },
-  // Indices — valeurs réalistes avril 2026 (S&P ~5200 après correction)
-  { slug:"sp500-above-5500-end-2026",     label:"S&P 500 au-dessus de 5 500 fin 2026",         category:"📊 Indices boursiers",            emoji:"📈", market:{ outcomePrices:"[0.52,0.48]", volume:7800000, endDate:"2026-12-31" } },
-  { slug:"sp500-bear-market-2026",        label:"S&P 500 en bear market en 2026 (−20%)",       category:"📊 Indices boursiers",            emoji:"🐻", market:{ outcomePrices:"[0.44,0.56]", volume:5600000, endDate:"2026-12-31" } },
-  { slug:"nasdaq-bear-market-2026",       label:"Nasdaq en bear market en 2026 (−20%)",        category:"📊 Indices boursiers",            emoji:"🐻", market:{ outcomePrices:"[0.51,0.49]", volume:4100000, endDate:"2026-12-31" } },
-  { slug:"cac40-above-7500-end-2026",     label:"CAC 40 au-dessus de 7 500 fin 2026",          category:"📊 Indices boursiers",            emoji:"🇫🇷", market:{ outcomePrices:"[0.48,0.52]", volume:980000,  endDate:"2026-12-31" } },
-  // Commodities & crypto — or ~3100$, pétrole ~65$, BTC ~80k
-  { slug:"gold-above-4000-2026",          label:"Or dépasse 4 000 $/oz en 2026",               category:"🥇 Matières premières & Crypto",  emoji:"🥇", market:{ outcomePrices:"[0.62,0.38]", volume:6400000, endDate:"2026-12-31" } },
-  { slug:"oil-brent-above-80-2026",       label:"Pétrole Brent dépasse 80$ en 2026",           category:"🥇 Matières premières & Crypto",  emoji:"🛢️", market:{ outcomePrices:"[0.38,0.62]", volume:3300000, endDate:"2026-12-31" } },
-  { slug:"bitcoin-above-100k-2026",       label:"Bitcoin dépasse 100 000$ en 2026",            category:"🥇 Matières premières & Crypto",  emoji:"₿",  market:{ outcomePrices:"[0.55,0.45]", volume:12000000,endDate:"2026-12-31" } },
-  { slug:"bitcoin-above-150k-2026",       label:"Bitcoin dépasse 150 000$ en 2026",            category:"🥇 Matières premières & Crypto",  emoji:"₿",  market:{ outcomePrices:"[0.29,0.71]", volume:8200000, endDate:"2026-12-31" } },
-  // Géopolitique
-  { slug:"israel-iran-war-2026",          label:"Conflit militaire direct Israël-Iran en 2026", category:"🌍 Géopolitique",                emoji:"⚔️", market:{ outcomePrices:"[0.21,0.79]", volume:5100000, endDate:"2026-12-31" } },
-  { slug:"north-korea-missile-2026",      label:"Tir de missile nord-coréen vers le Japon",    category:"🌍 Géopolitique",                emoji:"🚀", market:{ outcomePrices:"[0.33,0.67]", volume:1200000, endDate:"2026-12-31" } },
-  { slug:"taiwan-crisis-2026",            label:"Crise militaire dans le détroit de Taïwan",   category:"🌍 Géopolitique",                emoji:"🇹🇼", market:{ outcomePrices:"[0.09,0.91]", volume:3800000, endDate:"2026-12-31" } },
-  { slug:"iran-nuclear-deal-2026",        label:"Accord nucléaire avec l'Iran en 2026",        category:"🌍 Géopolitique",                emoji:"☢️", market:{ outcomePrices:"[0.22,0.78]", volume:900000,  endDate:"2026-12-31" } },
-  // Tech & IA
-  { slug:"openai-ipo-2026",              label:"Introduction en bourse d'OpenAI en 2026",     category:"💻 Tech & Intelligence artificielle", emoji:"🤖", market:{ outcomePrices:"[0.29,0.71]", volume:4200000, endDate:"2026-12-31" } },
-  { slug:"ai-regulation-us-2026",        label:"Loi fédérale sur l'IA aux États-Unis en 2026",category:"💻 Tech & Intelligence artificielle", emoji:"⚖️", market:{ outcomePrices:"[0.18,0.82]", volume:2100000, endDate:"2026-12-31" } },
-  { slug:"elon-musk-leaves-doge-2026",   label:"Elon Musk quitte le DOGE en 2026",            category:"💻 Tech & Intelligence artificielle", emoji:"🚀", market:{ outcomePrices:"[0.71,0.29]", volume:3500000, endDate:"2026-12-31" } },
-], history: {
-  "republicans-win-house-2026":  [0.18,0.16,0.15,0.14,0.13,0.12,0.12],
-  "democrats-win-house-2026":    [0.82,0.84,0.85,0.86,0.87,0.88,0.88],
-  "us-tariffs-remain-2026":      [0.55,0.58,0.62,0.65,0.68,0.70,0.72],
-  "us-recession-2026":           [0.45,0.48,0.51,0.54,0.57,0.59,0.61],
-  "ukraine-ceasefire-2026":      [0.62,0.61,0.59,0.57,0.56,0.55,0.55],
-  "bitcoin-above-100k-2026":     [0.68,0.65,0.62,0.60,0.58,0.56,0.55],
-  "gold-above-4000-2026":        [0.42,0.45,0.48,0.52,0.55,0.59,0.62],
-  "sp500-bear-market-2026":      [0.28,0.31,0.34,0.37,0.39,0.42,0.44],
-  "nasdaq-bear-market-2026":     [0.32,0.35,0.38,0.41,0.45,0.48,0.51],
-  "le-pen-wins-2027":            [0.35,0.35,0.36,0.37,0.37,0.38,0.38],
-  "fed-cut-rates-june-2026":     [0.28,0.29,0.30,0.31,0.32,0.33,0.34],
-  "ecb-rate-cut-q2-2026":        [0.62,0.60,0.58,0.57,0.56,0.55,0.55],
-  "elon-musk-leaves-doge-2026":  [0.55,0.58,0.61,0.64,0.67,0.69,0.71],
-  "israel-iran-war-2026":        [0.14,0.15,0.17,0.18,0.19,0.20,0.21],
-  "oil-brent-above-80-2026":     [0.52,0.50,0.47,0.44,0.42,0.40,0.38],
-}, top: [], cachedAt: new Date().toISOString() };
+// Slugs des marchés à afficher, avec nos labels français et catégories
+const WATCHED_SLUGS = [
+  { slug:"will-democrats-win-the-house-in-2026",               label:"Démocrates remportent la Chambre (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"will-republicans-win-the-house-in-2026",             label:"Républicains remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"will-democrats-win-the-senate-in-2026",              label:"Démocrates remportent le Sénat (2026)",       category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"will-republicans-win-the-senate-in-2026",            label:"Républicains remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
+  { slug:"will-trump-be-impeached",                            label:"Trump mis en accusation",                     category:"🇺🇸 Trump & politique US",             emoji:"⚖️" },
+  { slug:"will-trumps-net-approval-rating-be-positive-in-2026",label:"Cote nette de Trump positive en 2026",        category:"🇺🇸 Trump & politique US",             emoji:"📊" },
+  { slug:"will-marine-le-pen-win-the-2027-french-presidential-election", label:"Le Pen gagne la présidentielle 2027", category:"🇫🇷 France",                       emoji:"🇫🇷" },
+  { slug:"will-macron-resign-in-2026",                         label:"Macron démissionne en 2026",                  category:"🇫🇷 France",                           emoji:"🇫🇷" },
+  { slug:"will-there-be-a-ceasefire-in-ukraine-in-2026",       label:"Cessez-le-feu en Ukraine en 2026",            category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🕊️" },
+  { slug:"will-the-us-enter-a-recession-in-2026",              label:"Récession aux États-Unis en 2026",            category:"📉 Économie & Banques centrales",       emoji:"📉" },
+  { slug:"will-the-fed-cut-rates-at-the-june-2026-fomc-meeting",label:"La Fed baisse ses taux en juin 2026",       category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+  { slug:"will-the-ecb-cut-rates-in-q2-2026",                  label:"La BCE baisse ses taux au T2 2026",           category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+  { slug:"will-the-us-unemployment-rate-exceed-5-in-2026",     label:"Chômage US dépasse 5% en 2026",               category:"📉 Économie & Banques centrales",       emoji:"📊" },
+  { slug:"will-the-sp-500-be-in-a-bear-market-in-2026",        label:"S&P 500 en bear market en 2026",              category:"📊 Indices boursiers",                  emoji:"🐻" },
+  { slug:"will-the-nasdaq-be-in-a-bear-market-in-2026",        label:"Nasdaq en bear market en 2026",               category:"📊 Indices boursiers",                  emoji:"🐻" },
+  { slug:"will-gold-hit-4000-in-2026",                         label:"Or dépasse 4 000 $/oz en 2026",               category:"🥇 Matières premières & Crypto",        emoji:"🥇" },
+  { slug:"will-bitcoin-reach-100000-in-2026",                  label:"Bitcoin dépasse 100 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
+  { slug:"will-bitcoin-reach-150000-in-2026",                  label:"Bitcoin dépasse 150 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
+  { slug:"will-israel-attack-iran-in-2026",                    label:"Israël attaque militairement l'Iran en 2026", category:"🌍 Géopolitique",                       emoji:"⚔️" },
+  { slug:"will-there-be-a-us-china-military-conflict-over-taiwan-in-2026", label:"Conflit militaire USA-Chine sur Taïwan", category:"🌍 Géopolitique",               emoji:"🇹🇼" },
+  { slug:"will-openai-ipo-in-2026",                            label:"Introduction en bourse d'OpenAI en 2026",     category:"💻 Tech & Intelligence artificielle",   emoji:"🤖" },
+  { slug:"will-the-us-pass-federal-ai-legislation-in-2026",    label:"Loi fédérale sur l'IA aux États-Unis",        category:"💻 Tech & Intelligence artificielle",   emoji:"⚖️" },
+];
 
-DEMO.top = [...DEMO.watched]
-  .sort((a,b) => (b.market.volume||0) - (a.market.volume||0))
-  .slice(0,12)
-  .map(d => ({ slug:d.slug, question:d.label, outcomePrices:d.market.outcomePrices, volume:d.market.volume, endDate:d.market.endDate }));
+// ---- Données de secours (si Polymarket inaccessible) ----
+const DEMO = {
+  watched: [
+    { slug:"will-democrats-win-the-house-in-2026",    label:"Démocrates remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.88,0.12]", volume:3800000, endDate:"2026-11-04" } },
+    { slug:"will-republicans-win-the-house-in-2026",  label:"Républicains remportent la Chambre (2026)", category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.12,0.88]", volume:4200000, endDate:"2026-11-04" } },
+    { slug:"will-democrats-win-the-senate-in-2026",   label:"Démocrates remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.51,0.49]", volume:2900000, endDate:"2026-11-04" } },
+    { slug:"will-republicans-win-the-senate-in-2026", label:"Républicains remportent le Sénat (2026)",   category:"🇺🇸 Midterms 2026",              emoji:"🏛️", market:{ outcomePrices:"[0.49,0.51]", volume:3100000, endDate:"2026-11-04" } },
+    { slug:"will-trump-be-impeached",                 label:"Trump mis en accusation",                    category:"🇺🇸 Trump & politique US",        emoji:"⚖️", market:{ outcomePrices:"[0.07,0.93]", volume:1800000, endDate:"2029-01-20" } },
+    { slug:"will-the-us-enter-a-recession-in-2026",   label:"Récession aux États-Unis en 2026",          category:"📉 Économie & Banques centrales", emoji:"📉", market:{ outcomePrices:"[0.61,0.39]", volume:9700000, endDate:"2026-12-31" } },
+    { slug:"will-the-fed-cut-rates-at-the-june-2026-fomc-meeting", label:"La Fed baisse ses taux en juin 2026", category:"📉 Économie & Banques centrales", emoji:"🏦", market:{ outcomePrices:"[0.34,0.66]", volume:5500000, endDate:"2026-06-18" } },
+    { slug:"will-bitcoin-reach-100000-in-2026",       label:"Bitcoin dépasse 100 000$ en 2026",          category:"🥇 Matières premières & Crypto",  emoji:"₿",  market:{ outcomePrices:"[0.55,0.45]", volume:12000000,endDate:"2026-12-31" } },
+    { slug:"will-gold-hit-4000-in-2026",              label:"Or dépasse 4 000 $/oz en 2026",             category:"🥇 Matières premières & Crypto",  emoji:"🥇", market:{ outcomePrices:"[0.62,0.38]", volume:6400000, endDate:"2026-12-31" } },
+    { slug:"will-marine-le-pen-win-the-2027-french-presidential-election", label:"Le Pen gagne la présidentielle 2027", category:"🇫🇷 France",       emoji:"🇫🇷", market:{ outcomePrices:"[0.38,0.62]", volume:2200000, endDate:"2027-05-10" } },
+  ],
+  history: {},
+  top: [],
+  cachedAt: new Date().toISOString()
+};
+DEMO.top = [...DEMO.watched].sort((a,b)=>(b.market.volume||0)-(a.market.volume||0)).slice(0,8)
+  .map(d=>({ slug:d.slug, question:d.label, outcomePrices:d.market.outcomePrices, volume:d.market.volume, endDate:d.market.endDate }));
+
+// ---- Appel direct Polymarket Gamma API ----
+async function fetchMarketBySlug(slug) {
+  const res = await fetch(`${GAMMA}/markets?slug=${encodeURIComponent(slug)}&limit=1`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : null;
+}
+
+async function fetchTopPolitics() {
+  const res = await fetch(`${GAMMA}/markets?tag_slug=politics&limit=15&active=true&closed=false&order=volume&ascending=false`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+async function fetchHistory(tokenId) {
+  if (!tokenId) return null;
+  const endTs = Math.floor(Date.now() / 1000);
+  const startTs = endTs - 7 * 24 * 3600;
+  const res = await fetch(`${GAMMA}/prices-history?market=${tokenId}&startTs=${startTs}&endTs=${endTs}&fidelity=60`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const hist = data.history || [];
+  if (hist.length < 2) return null;
+  // Sous-échantillonner à 7 points
+  const step = Math.max(1, Math.floor(hist.length / 7));
+  return hist.filter((_,i) => i % step === 0).slice(-7).map(h => parseFloat(h.p));
+}
+
+// ---- Chargement ----
+async function loadData() {
+  document.getElementById('lastUpdate').textContent = 'Chargement…';
+
+  try {
+    // Charger tous les marchés surveillés en parallèle
+    const watchedResults = await Promise.all(
+      WATCHED_SLUGS.map(async def => {
+        const market = await fetchMarketBySlug(def.slug);
+        return market ? { ...def, market } : null;
+      })
+    );
+    const watched = watchedResults.filter(Boolean);
+
+    // Historique 7j en parallèle
+    const history = {};
+    await Promise.all(watched.map(async item => {
+      try {
+        const ids = item.market.clobTokenIds ? JSON.parse(item.market.clobTokenIds) : null;
+        if (ids && ids[0]) {
+          const hist = await fetchHistory(ids[0]);
+          if (hist) history[item.slug] = hist;
+        }
+      } catch {}
+    }));
+
+    // Top marchés
+    const topRaw = await fetchTopPolitics();
+    const top = topRaw.map(m => ({
+      slug: m.slug, question: m.question,
+      outcomePrices: m.outcomePrices,
+      volume: m.volume, endDate: m.endDate,
+    }));
+
+    document.getElementById('lastUpdate').textContent =
+      'MàJ ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+
+    renderGrids(watched, history);
+    renderTop(top);
+    renderSemaine(watched, history);
+
+  } catch(e) {
+    console.error('Erreur Polymarket:', e);
+    document.getElementById('lastUpdate').textContent = '⚠️ Mode démo';
+    renderGrids(DEMO.watched, DEMO.history);
+    renderTop(DEMO.top);
+    renderSemaine(DEMO.watched, DEMO.history);
+  }
+}
 
 // ---- Utilitaires ----
 function parsePrices(raw) {
@@ -699,27 +756,6 @@ function renderSemaine(watched, history) {
       setTimeout(()=>{ this.textContent='📋 Copier pour Substack'; this.classList.remove('copied'); },2000);
     });
   });
-}
-
-// ---- Chargement ----
-async function loadData() {
-  let data;
-  try {
-    const res = await fetch(`${API}?action=dashboard`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    data = await res.json();
-  } catch(e) {
-    console.warn('Mode démo :', e.message);
-    data = DEMO;
-  }
-  const ts = data.cachedAt ? new Date(data.cachedAt) : new Date();
-  document.getElementById('lastUpdate').textContent = 'MàJ ' + ts.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  const history = data.history || DEMO.history;
-  const watched = (data.watched && data.watched.length) ? data.watched : DEMO.watched;
-  const top     = (data.top     && data.top.length)     ? data.top     : DEMO.top;
-  renderGrids(watched, history);
-  renderTop(top);
-  renderSemaine(watched, history);
 }
 
 // ---- Tabs ----
