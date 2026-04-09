@@ -425,30 +425,44 @@
 
 const GAMMA = 'https://gamma-api.polymarket.com';
 
-// Slugs des marchés à afficher, avec nos labels français et catégories
+// Slugs CONFIRMÉS sur Polymarket (extraits des URLs réelles)
 const WATCHED_SLUGS = [
-  { slug:"will-democrats-win-the-house-in-2026",               label:"Démocrates remportent la Chambre (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
-  { slug:"will-republicans-win-the-house-in-2026",             label:"Républicains remportent la Chambre (2026)",   category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
-  { slug:"will-democrats-win-the-senate-in-2026",              label:"Démocrates remportent le Sénat (2026)",       category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
-  { slug:"will-republicans-win-the-senate-in-2026",            label:"Républicains remportent le Sénat (2026)",     category:"🇺🇸 Midterms 2026",                   emoji:"🏛️" },
-  { slug:"will-trump-be-impeached",                            label:"Trump mis en accusation",                     category:"🇺🇸 Trump & politique US",             emoji:"⚖️" },
-  { slug:"will-trumps-net-approval-rating-be-positive-in-2026",label:"Cote nette de Trump positive en 2026",        category:"🇺🇸 Trump & politique US",             emoji:"📊" },
-  { slug:"will-marine-le-pen-win-the-2027-french-presidential-election", label:"Le Pen gagne la présidentielle 2027", category:"🇫🇷 France",                       emoji:"🇫🇷" },
-  { slug:"will-macron-resign-in-2026",                         label:"Macron démissionne en 2026",                  category:"🇫🇷 France",                           emoji:"🇫🇷" },
-  { slug:"will-there-be-a-ceasefire-in-ukraine-in-2026",       label:"Cessez-le-feu en Ukraine en 2026",            category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🕊️" },
-  { slug:"will-the-us-enter-a-recession-in-2026",              label:"Récession aux États-Unis en 2026",            category:"📉 Économie & Banques centrales",       emoji:"📉" },
-  { slug:"will-the-fed-cut-rates-at-the-june-2026-fomc-meeting",label:"La Fed baisse ses taux en juin 2026",       category:"📉 Économie & Banques centrales",       emoji:"🏦" },
-  { slug:"will-the-ecb-cut-rates-in-q2-2026",                  label:"La BCE baisse ses taux au T2 2026",           category:"📉 Économie & Banques centrales",       emoji:"🏦" },
-  { slug:"will-the-us-unemployment-rate-exceed-5-in-2026",     label:"Chômage US dépasse 5% en 2026",               category:"📉 Économie & Banques centrales",       emoji:"📊" },
-  { slug:"will-the-sp-500-be-in-a-bear-market-in-2026",        label:"S&P 500 en bear market en 2026",              category:"📊 Indices boursiers",                  emoji:"🐻" },
-  { slug:"will-the-nasdaq-be-in-a-bear-market-in-2026",        label:"Nasdaq en bear market en 2026",               category:"📊 Indices boursiers",                  emoji:"🐻" },
-  { slug:"will-gold-hit-4000-in-2026",                         label:"Or dépasse 4 000 $/oz en 2026",               category:"🥇 Matières premières & Crypto",        emoji:"🥇" },
-  { slug:"will-bitcoin-reach-100000-in-2026",                  label:"Bitcoin dépasse 100 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
-  { slug:"will-bitcoin-reach-150000-in-2026",                  label:"Bitcoin dépasse 150 000$ en 2026",            category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
-  { slug:"will-israel-attack-iran-in-2026",                    label:"Israël attaque militairement l'Iran en 2026", category:"🌍 Géopolitique",                       emoji:"⚔️" },
+  // Midterms — slugs à confirmer, Polymarket n'a pas encore de marchés actifs sur les midterms 2026
+  // On utilise tag_slug pour les récupérer dynamiquement dans fetchTopPolitics()
+
+  // Trump & politique US
+  { slug:"will-trump-be-impeached",                            label:"Trump mis en accusation",                      category:"🇺🇸 Trump & politique US",             emoji:"⚖️" },
+  { slug:"will-trumps-net-approval-rating-be-positive-in-2026",label:"Cote nette de Trump positive en 2026",         category:"🇺🇸 Trump & politique US",             emoji:"📊" },
+
+  // France
+  { slug:"will-marine-le-pen-win-the-2027-french-presidential-election", label:"Le Pen gagne la présidentielle 2027", category:"🇫🇷 France",                         emoji:"🇫🇷" },
+  { slug:"will-macron-resign-in-2026",                         label:"Macron démissionne en 2026",                   category:"🇫🇷 France",                           emoji:"🇫🇷" },
+
+  // Europe
+  { slug:"will-there-be-a-ceasefire-in-ukraine-in-2026",       label:"Cessez-le-feu en Ukraine en 2026",             category:"🇩🇪 🇬🇧 🇪🇺 Reste de l'Europe",       emoji:"🕊️" },
+
+  // Macro — slugs confirmés
+  { slug:"us-recession-by-end-of-2026",                        label:"Récession aux États-Unis en 2026",             category:"📉 Économie & Banques centrales",       emoji:"📉" },
+  { slug:"will-the-fed-cut-rates-at-the-june-2026-fomc-meeting",label:"La Fed baisse ses taux en juin 2026",         category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+  { slug:"will-the-ecb-cut-rates-in-q2-2026",                  label:"La BCE baisse ses taux au T2 2026",            category:"📉 Économie & Banques centrales",       emoji:"🏦" },
+
+  // Indices — slug confirmé
+  { slug:"spx-close-dec-2026",                                 label:"S&P 500 en fin d'année 2026 (niveaux)",        category:"📊 Indices boursiers",                  emoji:"📈" },
+  { slug:"will-the-sp-500-enter-a-bear-market-in-2026",        label:"S&P 500 en bear market en 2026",              category:"📊 Indices boursiers",                  emoji:"🐻" },
+  { slug:"will-the-nasdaq-enter-a-bear-market-in-2026",        label:"Nasdaq en bear market en 2026",               category:"📊 Indices boursiers",                  emoji:"🐻" },
+
+  // Crypto — slug confirmé
+  { slug:"what-price-will-bitcoin-hit-before-2027",            label:"Bitcoin : niveau de prix atteint en 2026",     category:"🥇 Matières premières & Crypto",        emoji:"₿"  },
+  { slug:"gc-hit-jun-2026",                                    label:"Or : niveau de prix (futures juin 2026)",      category:"🥇 Matières premières & Crypto",        emoji:"🥇" },
+
+  // Géopolitique — slugs confirmés
+  { slug:"us-x-iran-ceasefire-before-oil-hits-120",            label:"Accord USA-Iran avant que le pétrole touche 120$", category:"🌍 Géopolitique",                  emoji:"🕊️" },
   { slug:"will-there-be-a-us-china-military-conflict-over-taiwan-in-2026", label:"Conflit militaire USA-Chine sur Taïwan", category:"🌍 Géopolitique",               emoji:"🇹🇼" },
-  { slug:"will-openai-ipo-in-2026",                            label:"Introduction en bourse d'OpenAI en 2026",     category:"💻 Tech & Intelligence artificielle",   emoji:"🤖" },
-  { slug:"will-the-us-pass-federal-ai-legislation-in-2026",    label:"Loi fédérale sur l'IA aux États-Unis",        category:"💻 Tech & Intelligence artificielle",   emoji:"⚖️" },
+
+  // Tech & IA — slugs confirmés
+  { slug:"openai-ipo-by",                                      label:"OpenAI en bourse en 2026",                     category:"💻 Tech & Intelligence artificielle",   emoji:"🤖" },
+  { slug:"ai-bubble-burst-by",                                 label:"Bulle IA éclate avant fin 2026",               category:"💻 Tech & Intelligence artificielle",   emoji:"💥" },
+  { slug:"openai-announces-it-has-achieved-agi-before-2027",   label:"OpenAI annonce avoir atteint l'AGI",           category:"💻 Tech & Intelligence artificielle",   emoji:"🧠" },
 ];
 
 // ---- Données de secours (si Polymarket inaccessible) ----
@@ -519,15 +533,23 @@ async function loadData() {
     const history = {};
     await Promise.all(watched.map(async item => {
       try {
-        const ids = item.market.clobTokenIds ? JSON.parse(item.market.clobTokenIds) : null;
-        if (ids && ids[0]) {
-          const hist = await fetchHistory(ids[0]);
+        // L'API Gamma retourne le tokenId dans plusieurs champs possibles
+        const m = item.market;
+        let tokenId = null;
+        if (m.clobTokenIds) {
+          const ids = JSON.parse(m.clobTokenIds);
+          tokenId = ids[0];
+        } else if (m.tokens && m.tokens[0]) {
+          tokenId = m.tokens[0].token_id;
+        }
+        if (tokenId) {
+          const hist = await fetchHistory(tokenId);
           if (hist) history[item.slug] = hist;
         }
       } catch {}
     }));
 
-    // Top marchés
+    // Top marchés — utilisés aussi pour Midterms si slugs non trouvés
     const topRaw = await fetchTopPolitics();
     const top = topRaw.map(m => ({
       slug: m.slug, question: m.question,
@@ -535,12 +557,23 @@ async function loadData() {
       volume: m.volume, endDate: m.endDate,
     }));
 
+    // Injecter les marchés top-politique dans l'onglet Midterms s'il est vide
+    const midtermsKeywords = ['house','senate','midterm','congress','2026 election'];
+    const midtermsMarkets = topRaw
+      .filter(m => midtermsKeywords.some(k => (m.question||'').toLowerCase().includes(k)))
+      .slice(0, 6)
+      .map(m => ({ slug: m.slug, label: m.question, category:'🇺🇸 Midterms 2026', emoji:'🏛️', market: m }));
+
+    const allWatched = [...watched, ...midtermsMarkets.filter(m =>
+      !watched.some(w => w.slug === m.slug)
+    )];
+
     document.getElementById('lastUpdate').textContent =
       'MàJ ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
 
-    renderGrids(watched, history);
+    renderGrids(allWatched, history);
     renderTop(top);
-    renderSemaine(watched, history);
+    renderSemaine(allWatched, history);
 
   } catch(e) {
     console.error('Erreur Polymarket:', e);
